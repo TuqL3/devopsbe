@@ -3,20 +3,27 @@ name: Publish Backend Image
 on:
   push:
     branches: [develop]
-  workflow_dispatch:
 
 permissions:
   contents: read
   packages: write
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ghcr.io/tuql3/devopsbe
-
 jobs:
+  checks:
+    name: Run backend checks
+    uses: ./.github/workflows/ci-reusable.yml
+
   publish:
-    name: Build and Publish
+    name: Build and Publish Backend Image
+    needs: checks
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      IMAGE_NAME: ghcr.io/tuql3/devopsbe
 
     steps:
       - name: Checkout
@@ -40,11 +47,13 @@ jobs:
           tags: |
             type=sha,format=long,prefix=
             type=raw,value=develop
-      - name: Build and push image
+
+      - name: Build and push production image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
+          target: production
           platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
