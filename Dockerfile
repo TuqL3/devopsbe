@@ -17,6 +17,8 @@ COPY --chown=node:node . .
 
 USER node
 
+RUN npm run db:generate
+
 EXPOSE 3000
 
 CMD ["npm", "run", "dev"]
