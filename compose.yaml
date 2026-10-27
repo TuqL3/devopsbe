@@ -5,7 +5,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       DATABASE_URL: ${DATABASE_URL}
     depends_on:
       db:
@@ -38,5 +38,17 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  migrate:
+    build:
+      context: .
+      target: migration
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - tools
+
 volumes:
   pgdata:
