@@ -2,13 +2,9 @@ name: Backend CI
 
 on:
   push:
-    branches:
-      - develop
-      - master
+    branches: [develop, master]
   pull_request:
-    branches:
-      - develop
-      - master
+    branches: [develop, master]
 
 permissions:
   contents: read
