@@ -4,6 +4,8 @@ coverage/
 .env
 .env.*
 !.env.example
+release.env
+previous.env
 src/generated/
 *.log
 .DS_Store

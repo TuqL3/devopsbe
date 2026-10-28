@@ -7,6 +7,10 @@
 **/.classpath
 **/.dockerignore
 **/.env
+**/.env.*
+!**/.env.example
+release.env
+previous.env
 **/.git
 **/.gitignore
 **/.project
