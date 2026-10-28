@@ -1,0 +1,63 @@
+name: todo-release
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: todo
+      POSTGRES_DB: todo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD, pg_isready, -U, todo, -d, todo]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  migrate:
+    image: ghcr.io/tuql3/devopsbe:${BACKEND_SHA:?Set BACKEND_SHA}-migration
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL}
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: [tools]
+
+  backend:
+    image: ghcr.io/tuql3/devopsbe:${BACKEND_SHA:?Set BACKEND_SHA}
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/api/health/ready').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    stop_grace_period: 15s
+    restart: unless-stopped
+
+  frontend:
+    image: ghcr.io/tuql3/devopfe:${FRONTEND_SHA:?Set FRONTEND_SHA}
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-8080}:${FRONTEND_CONTAINER_PORT:-8080}"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, "http://127.0.0.1:${FRONTEND_CONTAINER_PORT:-8080}/"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  pgdata:

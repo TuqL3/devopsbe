@@ -7,7 +7,7 @@
 help:
 	@echo "Available commands:"
 	@echo "  make build          Build Docker images"
-	@echo "  make up             Start services"
+	@echo "  make up             Apply migrations, build and start services"
 	@echo "  make down           Stop and remove containers"
 	@echo "  make restart        Restart backend"
 	@echo "  make ps             Show service status"
@@ -26,8 +26,8 @@ help:
 build:
 	docker compose build
 
-up:
-	docker compose up -d
+up: migrate
+	docker compose up -d --build --wait server
 
 down:
 	docker compose down
@@ -51,22 +51,22 @@ shell:
 	docker compose exec server sh
 
 migrate:
-	docker compose exec server npx prisma migrate deploy
+	docker compose run --rm --build migrate
 
 migrate-status:
-	docker compose exec server npx prisma migrate status
+	docker compose run --rm --build migrate npm run db:migrate:status
 
 db-shell:
 	docker compose exec db psql -U postgres -d testdb
 
 test:
-	docker compose exec server npm test
+	docker compose run --rm --build --no-deps tools npm test
 
 lint:
-	docker compose exec server npm run lint
+	docker compose run --rm --build --no-deps tools npm run lint
 
 typecheck:
-	docker compose exec server npm run type-check
+	docker compose run --rm --build --no-deps tools npm run type-check
 
 clean:
 	docker compose down

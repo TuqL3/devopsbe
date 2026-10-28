@@ -16,8 +16,10 @@ RUN --mount=type=cache,target=/root/.npm \
 # Stage: Prisma migration runner
 FROM deps AS migration
 
-COPY prisma.config.ts ./prisma.config.ts
-COPY prisma ./prisma
+COPY --chown=node:node prisma.config.ts ./prisma.config.ts
+COPY --chown=node:node prisma ./prisma
+
+USER node
 
 CMD ["npm", "run", "db:migrate:deploy"]
 

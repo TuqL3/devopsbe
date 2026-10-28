@@ -49,6 +49,12 @@ services:
         condition: service_healthy
     profiles:
       - tools
+  tools:
+    build:
+      context: .
+      target: build
+    profiles:
+      - tools
 
 volumes:
   pgdata:

@@ -44,6 +44,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
+          context: git
           images: ${{ env.IMAGE_NAME }}
           tags: |
             type=sha,format=long,prefix=
@@ -59,5 +60,18 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=backend-runtime
+          cache-to: type=gha,mode=max,scope=backend-runtime
+
+      - name: Build and push migration image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          target: migration
+          platforms: linux/amd64
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:${{ github.event.workflow_run.head_sha }}-migration
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=backend-migration
+          cache-to: type=gha,mode=max,scope=backend-migration
