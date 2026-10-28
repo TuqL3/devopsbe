@@ -46,6 +46,8 @@ required checks trên `develop`/`master`. SonarQube/Trivy thuộc bước tiếp
 
 `compose.release.yaml` chạy frontend, backend, PostgreSQL và migration runner.
 Các container dùng chung network; hostname `backend` khớp Nginx proxy `/api`.
+Compose restart frontend khi cập nhật backend để Nginx phân giải lại địa chỉ
+backend, kể cả khi chỉ SHA backend thay đổi.
 Project mặc định `todo-release` có volume riêng, không dùng volume `be_pgdata`
 của local development. PostgreSQL và backend không publish cổng ra host.
 
