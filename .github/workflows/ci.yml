@@ -62,7 +62,7 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: postgresql://postgres:123456@localhost:5432/todo_test
+      DATABASE_URL: postgresql://postgres:123456@localhost:5432/todo_app
       TEST_DATABASE_URL: postgresql://postgres:123456@localhost:5432/todo_test
 
     steps:
@@ -81,8 +81,17 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
 
+      - name: Create test database
+        env:
+          PGPASSWORD: "123456"
+        run: |
+          psql -h localhost -U postgres -d todo_app \
+            -c "CREATE DATABASE todo_test;"
+
       - name: Apply database migrations
         run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ env.TEST_DATABASE_URL }}
 
       - name: Integration tests
         run: npm run test:integration
