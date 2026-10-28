@@ -52,6 +52,7 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+        restart: true
     healthcheck:
       test: [CMD, wget, -q, -O, /dev/null, "http://127.0.0.1:${FRONTEND_CONTAINER_PORT:-8080}/"]
       interval: 5s
