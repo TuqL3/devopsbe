@@ -44,11 +44,12 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          context: git
           images: ${{ env.IMAGE_NAME }}
           tags: |
-            type=sha,format=long,prefix=
+            type=raw,value=${{ github.event.workflow_run.head_sha }}
             type=raw,value=develop
+          labels: |
+            org.opencontainers.image.revision=${{ github.event.workflow_run.head_sha }}
 
       - name: Build and push image
         uses: docker/build-push-action@v6
