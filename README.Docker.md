@@ -36,7 +36,8 @@ commit đã kiểm tra và xuất bản:
 - `ghcr.io/tuql3/devopsbe:<full-commit-sha>-migration`: schema, migrations và CLI.
 - `ghcr.io/tuql3/devopsbe:develop`: tag tiện dụng có thể thay đổi.
 
-Metadata lấy SHA từ Git checkout. Dùng SHA để release, giữ image của phiên bản
+Tag và revision lấy trực tiếp SHA của lượt CI đã pass, trùng Git checkout.
+Dùng SHA để release, giữ image của phiên bản
 đang chạy và ít nhất một phiên bản trước; không xóa chúng khi dọn GHCR.
 CI gates hiện tại là lint, type-check, unit/integration tests và build, cùng
 required checks trên `develop`/`master`. SonarQube/Trivy thuộc bước tiếp theo.
